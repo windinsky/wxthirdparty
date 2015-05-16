@@ -1,9 +1,10 @@
 ## 安装：
+	cd $node_modules_folder
 	git clone git@github.com:windinsky/wxthirdparty.git
-	cd $node_modules_path/wixthirdparty
+	cd wixthirdparty
 	npm install
 
-是不是很想直接npm install？哈哈哈哈哈哈哈哈哈，我不会弄。。。。
+是不是很想直接npm install wxthirdparty？哈哈哈哈哈哈哈哈哈，我不会弄。。。。
 
 ## 调用：
 ```js
