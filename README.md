@@ -11,16 +11,16 @@
 	
 /**********  app.js  *********/
 
-var appid = '第三方应用appid'
-, appsecret = '第三方应用appsecret'
-, token = '第三方应用中设置的公众号消息校验Token'
-, key = '第三方应用中设置的公众号消息加解密Key'
-, db = 'mysql://user:password@host/yourdatabase';
+var appid       = '第三方应用appid'
+    , appsecret = '第三方应用appsecret'
+    , token     = '第三方应用中设置的公众号消息校验Token'
+    , key       = '第三方应用中设置的公众号消息加解密Key'
+    , db        = 'mysql://user:password@host/yourdatabase';
 
 
-if (cluster.isMaster) {
+if ( cluster.isMaster ) {
 	// Fork workers.
-	for (var i = 0; i < numCPUs; i++) cluster.fork();
+	for (var i = 0 ; i < numCPUs ; i++) cluster.fork();
 	
 	// 主进程的模块只负责刷新component_token和pre_auth_code
 	global.thirdparty = new ThirdpartyServer(
@@ -32,12 +32,12 @@ if (cluster.isMaster) {
 	);
 	thirdparty.start();
 
-	cluster.on('exit', function(worker, code, signal) {
-		console.log('worker ' + worker.process.pid + ' died');
+	cluster.on( 'exit' , function( worker , code , signal ) {
+		console.log( 'worker ' + worker.process.pid + ' died' );
 		cluster.fork();
 	});
 	
-	thirdparty.once('ready' , function(){
+	thirdparty.once( 'ready' , function(){
 		// enable_auth_related_actions();
 	})
 
@@ -54,19 +54,19 @@ if (cluster.isMaster) {
 	
 	// Workers can share any TCP connection
 	// In this case its a HTTP server
-	http.createServer(function(req, res) {
+	http.createServer( function( req , res ) {
 		// ...
-	}).listen(80);
+	}).listen( 80 );
 }
 
 /***********  使用样例，展示follower的头像  **********/
 
-app.get('show_head_img',function(req,res){
+app.get( 'show_head_img' , function( req , res ){
 
 	// 根据cookie从数据库中获取公众号信息
 	thirdparty.get_user_info( req.cookie.wx_token , function( err , user_info ){
 
-		if( err ) return res.end(JSON.stringify(err));
+		if( err ) return res.end( JSON.stringify( err ) );
 
 		var client = thirdparty.createClient( user_info );
 		var openid = req.__get.openid;
@@ -74,14 +74,14 @@ app.get('show_head_img',function(req,res){
 		// 调用公众号api获取目标用户的信息
 		client.getUser(openid,function( err , follower ){
 		
-			if( err ) return res.end(JSON.stringify(err));
+			if( err ) return res.end( JSON.stringify( err ) );
 		
-			res.setHeader('content-type','text/html');
+			res.setHeader( 'content-type' , 'text/html' );
 			
-			if(data.headimgurl){
-				res.end('<img src="'+follower.headimgurl+'"/>');
+			if( data.headimgurl ){
+				res.end( ['<img src="',follower.headimgurl,'"/>'].join( '' ) );
 			}else{
-				res.end(follower.nickname + ' has no head img');
+				res.end( follower.nickname + ' has no head img' );
 			}
 			
 		});
