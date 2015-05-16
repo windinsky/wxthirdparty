@@ -1,11 +1,11 @@
-# 安装：
+## 安装：
 	git clone git@github.com:windinsky/wxthirdparty.git
 	cd $node_modules_path/wixthirdparty
 	npm install
 
 是不是很想直接npm install？哈哈哈哈哈哈哈哈哈，我不会弄。。。。
 
-# 调用：
+## 调用：
 ```js
 	
 /**********  app.js  *********/
@@ -104,7 +104,7 @@ app.get('show_head_img',function(req,res){
 
 这个不加整个模块都没任何用处。。。
 
-# 注意事项：
+## 注意事项：
 
 ####本模块需要在两个server中分别调用:
 
