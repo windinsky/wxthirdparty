@@ -58,7 +58,7 @@ if (cluster.isMaster) {
 	}).listen(80);
 }
 
-/***********  some_action.js  **********/
+/***********  使用样例，展示follower的头像  **********/
 
 app.get('show_head_img',function(req,res){
 
@@ -71,14 +71,14 @@ app.get('show_head_img',function(req,res){
 		var openid = req.__get.openid;
 		
 		// 调用公众号api获取目标用户的信息
-		client.getUser(openid,function( err , data ){
+		client.getUser(openid,function( err , follower ){
 		
 			res.setHeader('content-type','text/html');
 			
 			if(data.headimgurl){
-				res.end('<img src="'+data.headimgurl+'"/>');
+				res.end('<img src="'+follower.headimgurl+'"/>');
 			}else{
-				res.end(data.nickname + ' has no head img');
+				res.end(follower.nickname + ' has no head img');
 			}
 			
 		});
