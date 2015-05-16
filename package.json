@@ -1,0 +1,8 @@
+{
+	"dependencies":{
+		"xml2js" : ">=0.4.8",
+		"orm":">=2.1.25",
+		"wechat-crypto":">=0.0.2",
+		"wechat-api":">=1.9.0"
+	}
+}
