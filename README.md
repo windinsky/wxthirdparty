@@ -117,63 +117,63 @@ app.get('show_head_img',function(req,res){
 ### 数据库建表语句：
 
 Mysql：
+```mysql
+CREATE TABLE `component_secrets` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `ticket` varchar(255) DEFAULT NULL,
+  `access_token` varchar(255) DEFAULT NULL,
+  `preauthcode` varchar(255) DEFAULT NULL,
+  `ticket_updated_at` bigint(20) DEFAULT NULL,
+  `access_token_updated_at` bigint(20) DEFAULT NULL,
+  `preauthcode_updated_at` bigint(20) DEFAULT NULL,
+  `access_token_expires_in` int(64) DEFAULT NULL,
+  `preauthcode_expires_in` int(64) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 
-	CREATE TABLE `component_secrets` (
-	  `id` int(10) NOT NULL AUTO_INCREMENT,
-	  `ticket` varchar(255) DEFAULT NULL,
-	  `access_token` varchar(255) DEFAULT NULL,
-	  `preauthcode` varchar(255) DEFAULT NULL,
-	  `ticket_updated_at` bigint(20) DEFAULT NULL,
-	  `access_token_updated_at` bigint(20) DEFAULT NULL,
-	  `preauthcode_updated_at` bigint(20) DEFAULT NULL,
-	  `access_token_expires_in` int(64) DEFAULT NULL,
-	  `preauthcode_expires_in` int(64) DEFAULT NULL,
-	  PRIMARY KEY (`id`)
-	) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
-	
-	CREATE TABLE `wx_users_info` (
-	  `id` int(10) NOT NULL AUTO_INCREMENT,
-	  `appid` varchar(255) DEFAULT NULL,
-	  `access_token` varchar(255) DEFAULT NULL,
-	  `access_token_updated_at` datetime DEFAULT NULL,
-	  `access_token_expires_in` datetime DEFAULT NULL,
-	  `refresh_token` varchar(255) DEFAULT NULL,
-	  `nick_name` varchar(255) DEFAULT NULL,
-	  `head_img` varchar(255) DEFAULT NULL,
-	  `service_type_id` int(11) DEFAULT NULL,
-	  `verify_type_info` varchar(255) DEFAULT NULL,
-	  `user_name` varchar(255) DEFAULT NULL,
-	  `alias` varchar(255) DEFAULT NULL,
-	  `wx_token` varchar(255) DEFAULT NULL,
-	  PRIMARY KEY (`id`)
-	) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
-	
-	CREATE TABLE `wx_followers` (
-	  `id` int(10) NOT NULL AUTO_INCREMENT,
-	  `openid` varchar(255) DEFAULT NULL,
-	  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	  `wx_token` varchar(255) DEFAULT NULL,
-	  PRIMARY KEY (`id`)
-	) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
-	
-	CREATE TABLE `wx_followers_info` (
-	  `id` int(10) NOT NULL AUTO_INCREMENT,
-	  `subscribe` int(11) DEFAULT NULL,
-	  `openid` varchar(255) DEFAULT NULL,
-	  `nickname` varchar(255) DEFAULT NULL,
-	  `sex` int(11) DEFAULT NULL,
-	  `language` varchar(255) DEFAULT NULL,
-	  `city` varchar(255) DEFAULT NULL,
-	  `province` varchar(255) DEFAULT NULL,
-	  `country` varchar(255) DEFAULT NULL,
-	  `headimgurl` varchar(255) DEFAULT NULL,
-	  `subscribe_time` date DEFAULT NULL,
-	  `unionid` varchar(255) DEFAULT NULL,
-	  `remark` varchar(255) DEFAULT NULL,
-	  `groupid` int(11) DEFAULT NULL,
-	  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	  `created_at` datetime NOT NULL,
-	  PRIMARY KEY (`id`)
-	) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+CREATE TABLE `wx_users_info` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `appid` varchar(255) DEFAULT NULL,
+  `access_token` varchar(255) DEFAULT NULL,
+  `access_token_updated_at` datetime DEFAULT NULL,
+  `access_token_expires_in` datetime DEFAULT NULL,
+  `refresh_token` varchar(255) DEFAULT NULL,
+  `nick_name` varchar(255) DEFAULT NULL,
+  `head_img` varchar(255) DEFAULT NULL,
+  `service_type_id` int(11) DEFAULT NULL,
+  `verify_type_info` varchar(255) DEFAULT NULL,
+  `user_name` varchar(255) DEFAULT NULL,
+  `alias` varchar(255) DEFAULT NULL,
+  `wx_token` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `wx_followers` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `openid` varchar(255) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `wx_token` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `wx_followers_info` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `subscribe` int(11) DEFAULT NULL,
+  `openid` varchar(255) DEFAULT NULL,
+  `nickname` varchar(255) DEFAULT NULL,
+  `sex` int(11) DEFAULT NULL,
+  `language` varchar(255) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `province` varchar(255) DEFAULT NULL,
+  `country` varchar(255) DEFAULT NULL,
+  `headimgurl` varchar(255) DEFAULT NULL,
+  `subscribe_time` date DEFAULT NULL,
+  `unionid` varchar(255) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  `groupid` int(11) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+```
 **TODO**: 把bigint全改成date。。。存时间戳的理由已经被我忘了！
