@@ -117,7 +117,7 @@ app.get('show_head_img',function(req,res){
 ### 数据库建表语句：
 
 Mysql：
-```mysql
+```sql
 CREATE TABLE `component_secrets` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `ticket` varchar(255) DEFAULT NULL,
