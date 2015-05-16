@@ -1,5 +1,5 @@
 # 安装方法：
-	git clone git@github.com:windinsky/wxthirdparty.git
+	git clone git@github.com:windinsky/wxthirdparty.==git==
 
 是不是很想npm install？哈哈哈哈哈哈哈哈哈，我不会弄。。。。
 
