@@ -85,18 +85,18 @@ app.get('show_head_img',function(req,res){
 ```
 
 在授权事件接收URL的响应函数中调用save_ticket方法以刷新ticket：
-	```javascript
-	//首先在中间件里获取post的数据
-	'some_middleware' : function( req , res ){
-		req.on( 'data' , function( d ){
-			req.body += d.toString();
-		});
-	};
-	// 然后在授权事件接受URL的响应函数中存储ticket
-	'auth_callback_action ': function( req , res ){
-		thirdparty.save_ticket( req.body );
-	}
-	```
+```js
+//首先在中间件里获取post的数据
+'some_middleware' : function( req , res ){
+	req.on( 'data' , function( d ){
+		req.body += d.toString();
+	});
+};
+// 然后在授权事件接受URL的响应函数中存储ticket
+'auth_callback_action ': function( req , res ){
+	thirdparty.save_ticket( req.body );
+}
+```
 
 这个不加整个模块都没任何用处。。。
 
