@@ -6,83 +6,83 @@
 是不是很想直接npm install？哈哈哈哈哈哈哈哈哈，我不会弄。。。。
 
 # 调用方式：
-	```javascript
+```js
 	
-	/**********  app.js  *********/
-	
-	var appid = '第三方应用appid'
-	, appsecret = '第三方应用appsecret'
-	, token = '第三方应用中设置的公众号消息校验Token'
-	, key = '第三方应用中设置的公众号消息加解密Key'
-	, db = 'mysql://user:password@host/yourdatabase';
+/**********  app.js  *********/
+
+var appid = '第三方应用appid'
+, appsecret = '第三方应用appsecret'
+, token = '第三方应用中设置的公众号消息校验Token'
+, key = '第三方应用中设置的公众号消息加解密Key'
+, db = 'mysql://user:password@host/yourdatabase';
 
 
-	if (cluster.isMaster) {
-		// Fork workers.
-		for (var i = 0; i < numCPUs; i++) cluster.fork();
+if (cluster.isMaster) {
+	// Fork workers.
+	for (var i = 0; i < numCPUs; i++) cluster.fork();
 
-		global.thirdparty = new ThirdpartyServer(
-			appid , 
-			appsecret , 
-			token , 
-			key , 
-			db 
-		);
-		thirdparty.start();
+	global.thirdparty = new ThirdpartyServer(
+		appid , 
+		appsecret , 
+		token , 
+		key , 
+		db 
+	);
+	thirdparty.start();
 
-		cluster.on('exit', function(worker, code, signal) {
-			console.log('worker ' + worker.process.pid + ' died');
-			cluster.fork();
-		});
-		
-		thirdparty.once('ready' , function(){
-			// enable_auth_related_actions();
-		})
-
-	} else {
-
-		global.thirdparty = new ThirdpartyServer( 
-			appid , 
-			appsecret , 
-			token , 
-			key , 
-			db , 
-			== true ==
-		);
-		
-		// Workers can share any TCP connection
-		// In this case its a HTTP server
-		http.createServer(function(req, res) {
-			// ...
-		}).listen(80);
-	}
-	
-	/***********  some_action.js  **********/
-	
-	app.get('show_head_img',function(req,res){
-		thirdparty.get_user_info( req.cookie.wx_token , function( err , user_info ){
-
-			if( err ) res.end(JSON.stringify(err));
-
-			var client = thirdparty.createClient( user_info );
-			var openid = req.__get.openid;
-			
-			client.getUser(openid,function( err , data ){
-			
-				res.setHeader('content-type','text/html');
-				
-				if(data.headimgurl){
-					res.end('<img src="'+data.headimgurl+'"/>');
-				}else{
-					res.end(data.nickname + ' has no head img');
-				}
-				
-			});
-			//res.end(JSON.stringify(user_info)); 
-		});
+	cluster.on('exit', function(worker, code, signal) {
+		console.log('worker ' + worker.process.pid + ' died');
+		cluster.fork();
 	});
 	
-	```
+	thirdparty.once('ready' , function(){
+		// enable_auth_related_actions();
+	})
+
+} else {
+
+	global.thirdparty = new ThirdpartyServer( 
+		appid , 
+		appsecret , 
+		token , 
+		key , 
+		db , 
+		== true ==
+	);
+	
+	// Workers can share any TCP connection
+	// In this case its a HTTP server
+	http.createServer(function(req, res) {
+		// ...
+	}).listen(80);
+}
+
+/***********  some_action.js  **********/
+
+app.get('show_head_img',function(req,res){
+	thirdparty.get_user_info( req.cookie.wx_token , function( err , user_info ){
+
+		if( err ) res.end(JSON.stringify(err));
+
+		var client = thirdparty.createClient( user_info );
+		var openid = req.__get.openid;
+		
+		client.getUser(openid,function( err , data ){
+		
+			res.setHeader('content-type','text/html');
+			
+			if(data.headimgurl){
+				res.end('<img src="'+data.headimgurl+'"/>');
+			}else{
+				res.end(data.nickname + ' has no head img');
+			}
+			
+		});
+		//res.end(JSON.stringify(user_info)); 
+	});
+});
+	
+```
 
 在授权事件接收URL的响应函数中调用save_ticket方法以刷新ticket：
 	```javascript
