@@ -106,14 +106,15 @@ app.get('show_head_img',function(req,res){
 
 # 注意事项：
 
-本模块需要在两个server中分别调用:
+####本模块需要在两个server中分别调用:
 
 **一个单进程的模块 或者 master进程** 用于向微信api拉取access\_token等私密信息，is\_cluster传false或者不传，这个server需要一直保持运行，不需要附加其他任何业务
 
 其他的就是在实际server中用于处理业务请求的模块，这个只在cluster中启动, is\_cluster一定要传true，否则会导致token混乱，而且access_token拉取次数是有限制的，用完两个小时后所有业务就都歇菜了
 
-由于ticket是微信服务器向第三方平台推送的，所以每次重启server的时候都很难保证当前的ticket是否还有效
+####由于ticket是微信服务器向第三方平台推送的，所以每次重启server的时候都很难保证当前的ticket是否还有效
 
+#####解决方案：
 **重启server时先保证接收ticket的action正常**，在授权事件接收URL的处理函数中调用save\_ticket方法，10分钟之内就会收到微信的push请求
 
 **这个过程中最好设置一个全局标志位置为false，然后所有worker进程监听该标志位，为false时停用所有和授权有关的功能，ticket更新后再将其置为true，worker监测到变化后启动授权业务，注：这个标志位不能放在内存变量中（多进程不共享内存的），需要入库或者写文件**
