@@ -66,13 +66,15 @@ app.get('show_head_img',function(req,res){
 	// 根据cookie从数据库中获取公众号信息
 	thirdparty.get_user_info( req.cookie.wx_token , function( err , user_info ){
 
-		if( err ) res.end(JSON.stringify(err));
+		if( err ) return res.end(JSON.stringify(err));
 
 		var client = thirdparty.createClient( user_info );
 		var openid = req.__get.openid;
 		
 		// 调用公众号api获取目标用户的信息
 		client.getUser(openid,function( err , follower ){
+		
+			if( err ) return res.end(JSON.stringify(err));
 		
 			res.setHeader('content-type','text/html');
 			
