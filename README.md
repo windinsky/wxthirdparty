@@ -185,4 +185,7 @@ CREATE TABLE `wx_followers_info` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
 ```
-**TODO**: 把bigint全改成date。。。存时间戳的理由已经被我忘了！
+**TODO**: 
+	1. 把bigint全改成date。。。存时间戳的理由已经被我忘了！
+	2. 添加各个api的钩子记录各种信息，[钩子样例](https://github.com/windinsky/wxthirdparty/blob/master/lib/hooks/index.js)，这不是我一个人能干的活了。。
+	3. 补注释，等休完年假回来再说
