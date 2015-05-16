@@ -72,7 +72,7 @@ app.get( 'show_head_img' , function( req , res ){
 		var openid = req.__get.openid;
 		
 		// 调用公众号api获取目标用户的信息
-		client.getUser(openid,function( err , follower ){
+		client.getUser( openid , function( err , follower ){
 		
 			if( err ) return res.end( JSON.stringify( err ) );
 		
