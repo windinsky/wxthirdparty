@@ -47,7 +47,7 @@ if (cluster.isMaster) {
 		token , 
 		key , 
 		db , 
-		== true ==
+		true // very important
 	);
 	
 	// Workers can share any TCP connection
