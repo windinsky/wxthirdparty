@@ -1,28 +1,91 @@
 # 安装方法：
-	git clone git@github.com:windinsky/wxthirdparty.==git==
+	git clone git@github.com:windinsky/wxthirdparty.git
+	cd $node_modules_path/wixthirdparty
+	npm install
 
-是不是很想npm install？哈哈哈哈哈哈哈哈哈，我不会弄。。。。
+是不是很想直接npm install？哈哈哈哈哈哈哈哈哈，我不会弄。。。。
 
 # 调用方式：
-	var ThirdpartyServer = require('wxthirdparty').ThirdpartyServer;
-	var thirdparty = new ThirdpartyServer(
-		appid,
-		secret,
-		token,
-		// 公众号消息加解密Key
-		key, 
-		// orm2 连接数据库的字符串，如果主从库是分开的，传递object:
-		// {read:'xxxxxxxxx',write:'xxxxxxxxx'}
-		database_config, 
-		//！！！！！！！！！！！！！！！
-		//如果你的server用的cluster，这个参数超级超级超级超级重要，
-		//仔细读下面的注意事项！！！！！！！！！！！！！！
-		is_cluster 
-	);
-	thirdparty.start();
+	```javascript
+	
+	/**********  app.js  *********/
+	
+	var appid = '第三方应用appid'
+	, appsecret = '第三方应用appsecret'
+	, token = '第三方应用中设置的公众号消息校验Token'
+	, key = '第三方应用中设置的公众号消息加解密Key'
+	, db = 'mysql://user:password@host/yourdatabase';
 
-另外在授权事件接收URL的响应函数中一定要调用save_ticket方法以刷新ticket：
 
+	if (cluster.isMaster) {
+		// Fork workers.
+		for (var i = 0; i < numCPUs; i++) cluster.fork();
+
+		global.thirdparty = new ThirdpartyServer(
+			appid , 
+			appsecret , 
+			token , 
+			key , 
+			db 
+		);
+		thirdparty.start();
+
+		cluster.on('exit', function(worker, code, signal) {
+			console.log('worker ' + worker.process.pid + ' died');
+			cluster.fork();
+		});
+		
+		thirdparty.once('ready' , function(){
+			// enable_auth_related_actions();
+		})
+
+	} else {
+
+		global.thirdparty = new ThirdpartyServer( 
+			appid , 
+			appsecret , 
+			token , 
+			key , 
+			db , 
+			== true ==
+		);
+		
+		// Workers can share any TCP connection
+		// In this case its a HTTP server
+		http.createServer(function(req, res) {
+			// ...
+		}).listen(80);
+	}
+	
+	/***********  some_action.js  **********/
+	
+	app.get('show_head_img',function(req,res){
+		thirdparty.get_user_info( req.cookie.wx_token , function( err , user_info ){
+
+			if( err ) res.end(JSON.stringify(err));
+
+			var client = thirdparty.createClient( user_info );
+			var openid = req.__get.openid;
+			
+			client.getUser(openid,function( err , data ){
+			
+				res.setHeader('content-type','text/html');
+				
+				if(data.headimgurl){
+					res.end('<img src="'+data.headimgurl+'"/>');
+				}else{
+					res.end(data.nickname + ' has no head img');
+				}
+				
+			});
+			//res.end(JSON.stringify(user_info)); 
+		});
+	});
+	
+	```
+
+在授权事件接收URL的响应函数中调用save_ticket方法以刷新ticket：
+	```javascript
 	//首先在中间件里获取post的数据
 	'some_middleware' : function( req , res ){
 		req.on( 'data' , function( d ){
@@ -33,6 +96,7 @@
 	'auth_callback_action ': function( req , res ){
 		thirdparty.save_ticket( req.body );
 	}
+	```
 
 这个不加整个模块都没任何用处。。。
 
@@ -40,15 +104,15 @@
 
 本模块需要在两个server中分别调用:
 
-**一个单进程的模块**用于向微信api拉取access_token等私密信息，is_cluster传false或者不传，这个server需要一直保持运行，不需要附加其他任何业务
+**一个单进程的模块 || master进程** 用于向微信api拉取access\_token等私密信息，is\_cluster传false或者不传，这个server需要一直保持运行，不需要附加其他任何业务
 
-另一个就是在实际server中用于发起微信公众号api调用，这个可以在cluster中启动, is_cluster一定要传true，否则会导致token混乱，而且access_token拉取次数是有限制的，拉完就米有了
+其他的就是在实际server中用于发起微信公众号api调用，这个可以在cluster中启动, is\_cluster一定要传true，否则会导致token混乱，而且access_token拉取次数是有限制的，拉完就米有了
 
 由于ticket是微信服务器向第三方平台推送的，所以每次重启server的时候都很难保证当前的ticket是否还有效
 
-**重启server时先启动cluster的server**，在授权事件接收URL的处理函数中调用save\_ticket方法，10分钟之内就会收到微信的push请求，
-**这个过程中最好停用所有和授权有关的功能，直到ticket刷新**(这个过程中最好不要启动单进程的server，
-如果ticket已经失效会浪费好几次获取access_token的请求)，**可以在代码中记录ticket推送事件，接到推送之后再启用授权并启动单进程的server**
+**重启server时先保证接收ticket的action正常**，在授权事件接收URL的处理函数中调用save\_ticket方法，10分钟之内就会收到微信的push请求
+
+**这个过程中最好停用所有和授权有关的功能，直到ticket刷新，可以在代码中记录ticket推送事件，接到推送之后再启用授权并启动单进程的server**
 
 ### 数据库建表语句：
 
@@ -65,6 +129,51 @@ Mysql：
 	  `access_token_expires_in` int(64) DEFAULT NULL,
 	  `preauthcode_expires_in` int(64) DEFAULT NULL,
 	  PRIMARY KEY (`id`)
-	) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8
+	) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+	
+	CREATE TABLE `wx_users_info` (
+	  `id` int(10) NOT NULL AUTO_INCREMENT,
+	  `appid` varchar(255) DEFAULT NULL,
+	  `access_token` varchar(255) DEFAULT NULL,
+	  `access_token_updated_at` datetime DEFAULT NULL,
+	  `access_token_expires_in` datetime DEFAULT NULL,
+	  `refresh_token` varchar(255) DEFAULT NULL,
+	  `nick_name` varchar(255) DEFAULT NULL,
+	  `head_img` varchar(255) DEFAULT NULL,
+	  `service_type_id` int(11) DEFAULT NULL,
+	  `verify_type_info` varchar(255) DEFAULT NULL,
+	  `user_name` varchar(255) DEFAULT NULL,
+	  `alias` varchar(255) DEFAULT NULL,
+	  `wx_token` varchar(255) DEFAULT NULL,
+	  PRIMARY KEY (`id`)
+	) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
+	
+	CREATE TABLE `wx_followers` (
+	  `id` int(10) NOT NULL AUTO_INCREMENT,
+	  `openid` varchar(255) DEFAULT NULL,
+	  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	  `wx_token` varchar(255) DEFAULT NULL,
+	  PRIMARY KEY (`id`)
+	) ENGINE=MyISAM AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
+	
+	CREATE TABLE `wx_followers_info` (
+	  `id` int(10) NOT NULL AUTO_INCREMENT,
+	  `subscribe` int(11) DEFAULT NULL,
+	  `openid` varchar(255) DEFAULT NULL,
+	  `nickname` varchar(255) DEFAULT NULL,
+	  `sex` int(11) DEFAULT NULL,
+	  `language` varchar(255) DEFAULT NULL,
+	  `city` varchar(255) DEFAULT NULL,
+	  `province` varchar(255) DEFAULT NULL,
+	  `country` varchar(255) DEFAULT NULL,
+	  `headimgurl` varchar(255) DEFAULT NULL,
+	  `subscribe_time` date DEFAULT NULL,
+	  `unionid` varchar(255) DEFAULT NULL,
+	  `remark` varchar(255) DEFAULT NULL,
+	  `groupid` int(11) DEFAULT NULL,
+	  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	  `created_at` datetime NOT NULL,
+	  PRIMARY KEY (`id`)
+	) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
 
 **TODO**: 把bigint全改成date。。。存时间戳的理由已经被我忘了！
